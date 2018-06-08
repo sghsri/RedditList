@@ -4,30 +4,28 @@ import re
 import os
 import sys
 
+posts = []
 
-
-if not os.path.isfile("posts_replied_to.txt"):
-    posts_replied_to = []
-else:
-    with open("posts_replied_to.txt", "r") as f:
-       posts_replied_to = f.read()
-       posts_replied_to = posts_replied_to.split("\n")
-       posts_replied_to = list(filter(None, posts_replied_to))
-def reddit(sub, fil):
+def makelist(sub, fil, lim):
 	reddit = praw.Reddit('bot1')
 	subreddit = reddit.subreddit(sub)
+	#use the correct filter and limit
 	if fil == "top":
-		list = subreddit.top(limit=10)
-	elif fil == "hot": 
-		list = subreddit.hot(limit=10)
+		list = subreddit.top(limit=lim)
+	elif fil == "hot":
+		list = subreddit.hot(limit=lim)
+		#append the posts
 	for submission in list:
-		posts_replied_to.append(submission.title+"-"+str(submission.score)+"\n"+str(submission.url))
+		posts.append(submission.title+"-"+str(submission.score)+"\n"+str(submission.url)+"\n")
+		#write to file
 	with open("topposts.txt", "w") as f:
-		for post in posts_replied_to:
+		for post in posts:
 			f.write(post + "\n")
 def main():	
+	#let the user choose which subreddit,filter, and how many posts to make the list from
 	sub = input("subreddit? ")
 	fil = input("top/hot? ")
-	reddit(sub,fil)
+	lim = int(input("# of posts? "))
+	makelist(sub,fil,lim)
 if __name__ == '__main__':
   main()
